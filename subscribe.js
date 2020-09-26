@@ -3,7 +3,7 @@
 const nats = require('nats')
 const argv = require('minimist')(process.argv.slice(2))
 
-const url = argv.s || 'localhost'
+const url = argv.s || 'nats://localhost:4222'
 const creds = argv.creds || null
 const queue = argv.queue  || null
 const subject = argv._[0]
@@ -15,7 +15,18 @@ if (!subject) {
 }
 
 // Connect to NATS server.
-const nc = nats.connect(url, nats.creds(creds))
+const nc = nats.connect({
+  name: 'Subscriber Connection',
+  url,
+  userCreds: nats.creds(creds),
+  timeout: 10*1000, //10s
+  // pingInterval: 20*1000, //20s
+  // maxPingOut: 5,
+  // noEcho: true,
+  // pedantic: true,
+  // verbose: true,
+  // json: true
+})
 
 nc.on('connect', () => {
   const opts = {}
